@@ -1,0 +1,6 @@
+{
+    "main": "src/index.js",
+    "files": "src/**/*.js",
+    "dependencies": {
+    }
+}
