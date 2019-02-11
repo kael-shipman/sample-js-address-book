@@ -76,7 +76,4 @@ var addressBook = new AddressBook(
 // TODO: Juggle incoming commands via command-line vs starting up interactive prompt
 addressBook.open();
 
-// When open returns, we're done, so we can save it
-addressBook.write();
-
 

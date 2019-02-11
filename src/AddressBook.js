@@ -1,4 +1,5 @@
 var fs = require("fs");
+var Comm = require("./Comm");
 
 class AddressBook {
     /**
@@ -10,6 +11,7 @@ class AddressBook {
         this.options = Object.assign({
             verbosity: 1
         }, options || {});
+        this.comm = new Comm(proc);
 
         // If not string, assume STDIN
         if (datafile === "-") {
@@ -38,8 +40,7 @@ class AddressBook {
     async open() {
         while(true) {
             var output = null;
-            this.proc.stdout.write("Command: ");
-            var command = await this.getLine();
+            var command = await this.comm.prompt("Command: ");
 
             try {
                 if (command.match(/^help/)) {
@@ -62,6 +63,11 @@ class AddressBook {
                     output = this.count(command.join(" "));
                 } else if (command.match(/^write/)) {
                     output = this.write();
+                } else if (command.match(/^quit/)) {
+                    this.proc.stdout.write(`\nSaving and quitting.\n`);
+                    this.write();
+                    this.proc.stdin.pause();
+                    return;
                 } else {
                     throw new Error(`Command '${command}' not recognized. Recognized commands are:\n${AddressBook.getCommands()}`);
                 }
@@ -143,10 +149,8 @@ class AddressBook {
         // If we haven't passed ask the user
         } else {
             data = {};
-            this.proc.stdout.write("Name: ");
-            data.name = await this.getLine();
-            this.proc.stdout.write("Address: ");
-            data.address = await this.getLine();
+            data.name = await this.comm.prompt("Name: ");
+            data.address = await this.comm.prompt("Address: ");
         }
 
         // Validate and insert
@@ -241,18 +245,6 @@ class AddressBook {
         } else {
             this.proc.stdout.write(JSON.stringify(this.data));
         }
-    }
-
-    /**
-     * Get a single line of stdin
-     */
-    getLine() {
-        var t = this;
-        return new Promise(function(resolve, reject) {
-            // TODO: Figure out how not to register a new handler every time
-            t.proc.stdin.on("data", function(line) { resolve(line.toString("utf8").replace("\n", "")); });
-            t.proc.stdin.on("error", function(e) { reject(e); });
-        });
     }
 
     static help() {
