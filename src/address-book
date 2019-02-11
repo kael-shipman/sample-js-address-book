@@ -20,7 +20,7 @@ args.shift();
  * datafile string The path to the data file to read and write from (if `-`, read
  * from stdin and write to stdout).
  */
-var datafile = "-";
+var datafile = null;
 
 /**
  * verbosity number The level of verbosity of output.
@@ -64,16 +64,22 @@ while (args.length > 0) {
 
 
 
-// Create address book and pass it options
-var addressBook = new AddressBook(
-    datafile,
-    process,
-    {
-        verbosity: verbosity
-    }
-);
 
-// TODO: Juggle incoming commands via command-line vs starting up interactive prompt
-addressBook.open();
+try {
+    // Create address book and pass it options
+    var addressBook = new AddressBook(
+        datafile,
+        process,
+        {
+            verbosity: verbosity
+        }
+    );
 
+    // TODO: Juggle incoming commands via command-line vs starting up interactive prompt
+    addressBook.open();
+} catch (e) {
+    process.stderr.write(AddressBook.help());
+    process.stderr.write(`\nFATAL ERROR: ${e.message}\n`);
+    process.exit(5);
+}
 

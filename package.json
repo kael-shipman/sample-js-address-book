@@ -1,5 +1,5 @@
 {
-    "main": "src/index.js",
+    "main": "src/address-book",
     "files": "src/**/*.js",
     "dependencies": {
     }

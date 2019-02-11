@@ -13,7 +13,13 @@ class AddressBook {
         }, options || {});
         this.comm = new Comm(proc);
 
-        // If not string, assume STDIN
+        // Make sure datafile isn't null
+        if (datafile === null) {
+            throw new Error("You must pass in a valid data file");
+        }
+
+        // Now process....
+        // TODO: piping into stdin no longer works as expected
         if (datafile === "-") {
             var t = this;
             var stdin = "";
@@ -271,7 +277,7 @@ COMMANDS
 
 Once the program has been initialized, you may use the following commands to access its
 functions. Note that for all [filter] paramters, asterisk (*) matches all.
-${AddressBook.getCommands}
+${AddressBook.getCommands()}
 `;
     }
 
